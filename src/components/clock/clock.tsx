@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import { StyledCenter, StyledCircle, StyledContainer, StyledHoursArrow, StyledMinutesArrow, StyledNine, StyledSecondsArrow, StyledSix, StyledThree, StyledTime, StyledTwelve } from './clock.styles';
 import { TClockProps } from './type';
@@ -12,8 +12,6 @@ export const Clock: React.FC<TClockProps> = ({
   const [seconds, setSeconds] = useState(0);
   const [date, setDate] = useState<Date>();
 
-  const handle = useRef<NodeJS.Timer>();
-
   useEffect(
     () => {
       setDate(new Date(startDate ?? new Date()));
@@ -22,12 +20,7 @@ export const Clock: React.FC<TClockProps> = ({
   );
 
   useEffect(() => {
-    if (handle.current) {
-      clearInterval(handle.current);
-      handle.current = undefined;
-    }
-
-    handle.current = setTimeout(() => {
+    const handle = setTimeout(() => {
       if (!date) {
         return;
       }
@@ -42,6 +35,10 @@ export const Clock: React.FC<TClockProps> = ({
       setSeconds(ss);
       setDate(newDate);
     }, 1000);
+
+    return () => {
+      clearInterval(handle);
+    };
   }, [date]);
 
   const formated = useMemo(
